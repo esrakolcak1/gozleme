@@ -1,10 +1,39 @@
-import React from 'react';
-import { Card, Row, Col } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
-
-import Breadcrumb from '../../../layouts/AdminLayout/Breadcrumb';
+import React, { useState, useCallback } from "react";
+import { Card, Row, Col } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
+import { auth, db } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
 
 const SignUp1 = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // Varsayılan rol olarak 'user'
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault(); // sayfa yenilenmesini önleme
+      console.log("email", email, "password", password, "role", role);
+      if (!email || !password) {
+        return;
+      }
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          // Kullanıcı veritabanına rol ekleyin
+          db.ref("users/" + user.uid).set({
+            email: user.email,
+            role: role,
+          });
+          alert("Kayıt oldunuz");
+        })
+        .catch((e) => {
+          alert(e.message);
+        });
+    },
+    [email, password, role]
+  );
+
   return (
     <React.Fragment>
       <Breadcrumb />
@@ -24,19 +53,40 @@ const SignUp1 = () => {
                     <i className="feather icon-user-plus auth-icon" />
                   </div>
                   <h3 className="mb-4">Kayıt Ol</h3>
-                  <div className="input-group mb-3">
-                    <input type="text" className="form-control" placeholder="Kullanıcı Adı" />
-                  </div>
-                  <div className="input-group mb-3">
-                    <input type="email" className="form-control" placeholder="Email adresi" />
-                  </div>
-                  <div className="input-group mb-4">
-                    <input type="password" className="form-control" placeholder="Şifre" />
-                  </div>
-
-                  <button className="btn btn-primary mb-4">Kayıt Ol</button>
+                  <form onSubmit={handleSubmit}>
+                    <div className="input-group mb-3">
+                      <input
+                        type="email"
+                        className="form-control"
+                        placeholder="Email adresi"
+                        value={email}
+                        onChange={(e) => setEmail(e.currentTarget.value)}
+                      />
+                    </div>
+                    <div className="input-group mb-4">
+                      <input
+                        type="password"
+                        className="form-control"
+                        placeholder="Şifre"
+                        value={password}
+                        onChange={(e) => setPassword(e.currentTarget.value)}
+                      />
+                    </div>
+                    <div className="input-group mb-4">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Rol (Varsayılan: user)"
+                        value={role}
+                        onChange={(e) => setRole(e.currentTarget.value)}
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-primary mb-4">
+                      Kayıt Ol
+                    </button>
+                  </form>
                   <p className="mb-2">
-                    Zaten bir hesabın var mı ?{' '}
+                    Zaten bir hesabın var mı?{" "}
                     <NavLink to="/auth/signin-1" className="f-w-400">
                       Giriş Yap
                     </NavLink>

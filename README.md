@@ -1,4 +1,4 @@
-# Datta Able React Free Admin Template [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Download%20Datta%20Able%20-%20The%20professional%20Bootstrap%20designed%20React%20Admin%20Dashboard%20Template%20&url=https://codedthemes.com/demos/admin-templates/datta-able/react/default&via=codedthemes&hashtags=reactjs,webdev,developers,javascript)
+<!-- # Datta Able React Free Admin Template [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Download%20Datta%20Able%20-%20The%20professional%20Bootstrap%20designed%20React%20Admin%20Dashboard%20Template%20&url=https://codedthemes.com/demos/admin-templates/datta-able/react/default&via=codedthemes&hashtags=reactjs,webdev,developers,javascript)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/codedthemes/datta-able-free-react-admin-template/blob/main/LICENSE)
@@ -18,17 +18,17 @@ It is modern concept dashboard design with eye catchy colors. Wish you happy to 
 
 The [Pro version](https://codedthemes.com/demos/admin-templates/datta-able/react/default) of Datta able react template includes features such as TypeScript, apps, authentication methods (i.e. JWT, Auth0, Firebase), advance components, form plugins, layouts, widgets, and more.
 
-| [Datta Able Free](https://codedthemes.com/demos/admin-templates/datta-able/react/free) | [Datta able Pro](https://codedthemes.com/demos/admin-templates/datta-able/react/default)                                         |
-| ---------------------------------------------- | :------------------------------------------------------------------------------- |
-| **7+** Demo pages                               | **85+** Demo pages                                                               |
-| -                                              | ✓ Multi-Layout                                                                 |
-| -                                              | ✓ Dark/Light Mode 🌓                                                             |
-| -                                              | ✓ TypeScript version                                                             |
-| -                                              | ✓ Multiple color options                                                         |
-| -                                              | ✓ RTL                                                                            |
-| -                                              | ✓ JWT, Firebase, Auth0, AWS authentication                                       |
-| -                                              | ✓ [More components](https://codedthemes.com/demos/admin-templates/datta-able/react/default/basic/alert) |
-| ✓ MIT License                                  | ✓ [Pro License](https://codedthemes.com/item/datta-able-react-admin-template/)                                  |
+| [Datta Able Free](https://codedthemes.com/demos/admin-templates/datta-able/react/free) | [Datta able Pro](https://codedthemes.com/demos/admin-templates/datta-able/react/default)                |
+| -------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| **7+** Demo pages                                                                      | **85+** Demo pages                                                                                      |
+| -                                                                                      | ✓ Multi-Layout                                                                                          |
+| -                                                                                      | ✓ Dark/Light Mode 🌓                                                                                    |
+| -                                                                                      | ✓ TypeScript version                                                                                    |
+| -                                                                                      | ✓ Multiple color options                                                                                |
+| -                                                                                      | ✓ RTL                                                                                                   |
+| -                                                                                      | ✓ JWT, Firebase, Auth0, AWS authentication                                                              |
+| -                                                                                      | ✓ [More components](https://codedthemes.com/demos/admin-templates/datta-able/react/default/basic/alert) |
+| ✓ MIT License                                                                          | ✓ [Pro License](https://codedthemes.com/item/datta-able-react-admin-template/)                          |
 
 ## Why Datta Able?
 
@@ -154,4 +154,4 @@ Please generate a [GitHub issue](https://github.com/codedthemes/datta-able-free-
 - CodedThemes [https://codedthemes.com](https://codedthemes.com)
 - Dribbble [https://dribbble.com/codedthemes](https://dribbble.com/codedthemes)
 - Facebook [https://www.facebook.com/codedthemes](https://www.facebook.com/codedthemes)
-- Twitter [https://twitter.com/codedthemes](https://twitter.com/codedthemes)
+- Twitter [https://twitter.com/codedthemes](https://twitter.com/codedthemes) -->

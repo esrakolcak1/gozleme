@@ -1,14 +1,26 @@
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-
-// auth provider
-
-import routes, { renderRoutes } from './routes';
+import React, { useEffect } from "react";
+import { BrowserRouter, Route } from "react-router-dom";
+import routes, { renderRoutes } from "./routes";
+import businessmanIcon from "./businessman.png";
 
 const App = () => {
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "icon";
+    link.href = businessmanIcon;
+    link.type = "image/png";
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
   return (
     <React.Fragment>
-      <BrowserRouter basename={process.env.REACT_APP_BASE_NAME}>{renderRoutes(routes)}</BrowserRouter>
+      <BrowserRouter basename={process.env.REACT_APP_BASE_NAME}>
+        {renderRoutes(routes)}
+      </BrowserRouter>
     </React.Fragment>
   );
 };

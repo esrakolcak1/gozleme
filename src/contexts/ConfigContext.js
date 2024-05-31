@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
-import React, { createContext, useReducer } from 'react';
-import * as actionType from '../store/actions';
-import { CONFIG } from '../config/constant';
+import PropTypes from "prop-types";
+import React, { createContext, useReducer } from "react";
+import * as actionType from "../store/actions";
+import { CONFIG } from "../config/constant";
 
 const initialState = {
   ...CONFIG,
   isOpen: [],
-  isTrigger: []
+  isTrigger: [],
 };
 const ConfigContext = createContext(initialState);
 const { Provider } = ConfigContext;
@@ -20,15 +20,15 @@ const ConfigProvider = ({ children }) => {
       case actionType.CHANGE_LAYOUT:
         return {
           ...state,
-          layout: action.layout
+          layout: action.layout,
         };
       case actionType.COLLAPSE_MENU:
         return {
           ...state,
-          collapseMenu: !state.collapseMenu
+          collapseMenu: !state.collapseMenu,
         };
       case actionType.COLLAPSE_TOGGLE:
-        if (action.menu.type === 'sub') {
+        if (action.menu.type === "sub") {
           open = state.isOpen;
           trigger = state.isTrigger;
 
@@ -51,15 +51,15 @@ const ConfigProvider = ({ children }) => {
         return {
           ...state,
           isOpen: open,
-          isTrigger: trigger
+          isTrigger: trigger,
         };
       case actionType.LAYOUT_TYPE:
         return {
           ...state,
-          layoutType: action.layoutType
+          layoutType: action.layoutType,
         };
       case actionType.NAV_COLLAPSE_LEAVE:
-        if (action.menu.type === 'sub') {
+        if (action.menu.type === "sub") {
           open = state.isOpen;
           trigger = state.isTrigger;
 
@@ -71,7 +71,7 @@ const ConfigProvider = ({ children }) => {
           return {
             ...state,
             isOpen: open,
-            isTrigger: trigger
+            isTrigger: trigger,
           };
         }
         return { ...state };
@@ -79,14 +79,14 @@ const ConfigProvider = ({ children }) => {
         return {
           ...state,
           isOpen: open,
-          isTrigger: trigger
+          isTrigger: trigger,
         };
       case actionType.RESET:
         return {
           ...state,
           layout: initialState.layout,
           collapseMenu: initialState.collapseMenu,
-          layoutType: initialState.layoutType
+          layoutType: initialState.layoutType,
         };
       default:
         throw new Error();
@@ -97,7 +97,7 @@ const ConfigProvider = ({ children }) => {
 };
 
 ConfigProvider.propTypes = {
-  children: PropTypes.object
+  children: PropTypes.object,
 };
 
 export { ConfigContext, ConfigProvider };

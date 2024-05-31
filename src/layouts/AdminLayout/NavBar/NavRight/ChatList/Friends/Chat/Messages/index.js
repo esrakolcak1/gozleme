@@ -5,15 +5,7 @@ import { Link } from 'react-router-dom';
 
 const images = require.context('../../../../../../../../assets/images/user', true);
 
-const Messages = ({ message, photo, name }) => {
-  let image = '';
-  if (message.type) {
-    image = (
-      <Link to="#" className="media-left photo-table">
-        <img className="media-object img-radius img-radius m-t-5" src={images(`./${photo}`)} alt={name} />
-      </Link>
-    );
-  }
+
 
   let msgClass = [];
   if (message.type) {
