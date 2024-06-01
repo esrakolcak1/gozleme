@@ -3,7 +3,8 @@ import { Card, Row, Col } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
-import { auth, db } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
+import { auth, firestore } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
+import { collection, addDoc } from "firebase/firestore";
 
 const SignUp1 = () => {
   const [email, setEmail] = useState("");
@@ -17,19 +18,24 @@ const SignUp1 = () => {
       if (!email || !password) {
         return;
       }
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          // Kullanıcı veritabanına rol ekleyin
-          db.ref("users/" + user.uid).set({
-            email: user.email,
-            role: role,
-          });
-          alert("Kayıt oldunuz");
-        })
-        .catch((e) => {
-          alert(e.message);
-        });
+      // createUserWithEmailAndPassword(auth, email, password)
+      //   .then((userCredential) => {
+      //     const user = userCredential.user;
+      //     // Kullanıcı veritabanına rol ekleyin
+      //     db.ref("users/" + user.uid).set({
+      //       email: user.email,
+      //       role: role,
+      //     });
+
+      //     alert("Kayıt oldunuz");
+      //   })
+      //   .catch((e) => {
+      //     alert(e.message);
+      //   });
+      const docRef = addDoc(collection(firestore, "userr"), {
+        name: "John",
+        age: 30,
+      });
     },
     [email, password, role]
   );

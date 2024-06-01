@@ -19,9 +19,6 @@ const NavLogo = () => {
     <React.Fragment>
       <div className="navbar-brand header-logo">
         <Link to="#" className="b-brand">
-          {/* <div className="b-bg" style={{ background: `url(${BusinesManPng})`, width: '35px', height: '35px', overflow: 'hidden' }}>
-            <img src={BusinesManPng} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div> */}
           <img
             src={BusinesManPng}
             alt="Logo"
@@ -43,7 +40,7 @@ const NavLogo = () => {
           to="#"
           className={toggleClass.join(" ")}
           id="mobile-collapse"
-          onClick={() => dispatch({ type: actionType.COLLAPSE_MENU })}
+          // onClick={() => dispatch({ type: actionType.COLLAPSE_MENU })}
         >
           <span />
         </Link>

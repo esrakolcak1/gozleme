@@ -12,6 +12,7 @@ const BasicBadges = () => {
     number: "",
     semester: "",
     teacher: "",
+    bolum: "",
   });
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState({});
@@ -62,7 +63,8 @@ const BasicBadges = () => {
       !formData.name ||
       !formData.number ||
       !formData.semester ||
-      !formData.teacher
+      !formData.teacher ||
+      !formData.bolum
     ) {
       setError("Lütfen tüm alanları doldurun");
       return;
@@ -76,6 +78,7 @@ const BasicBadges = () => {
       numbers: formData.number,
       semester: formData.semester,
       teacher: formData.teacher,
+      bolum: formData.bolum,
     });
 
     if (editingIndex !== null) {
@@ -87,6 +90,7 @@ const BasicBadges = () => {
       number: "",
       semester: "",
       teacher: "",
+      bolum: "",
     });
 
     setEditingIndex(null);
@@ -188,6 +192,36 @@ const BasicBadges = () => {
                                 ))}
                             </Form.Control>
                           </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            as={Col}
+                            controlId="formGridDonem"
+                          >
+                            <Form.Label>Bölüm</Form.Label>
+                            <Form.Control
+                              as="select"
+                              name="bolum"
+                              value={formData.bolum}
+                              onChange={handleChange}
+                            >
+                              <option value="">Bölüm giriniz</option>
+                              <option> Bilgisayar Programcılığı</option>
+                              <option>Bilişim Güvenliği Teknolojisi</option>
+                              <option>Biyomedikal Cihaz Teknolojisi</option>
+                              <option>E-Ticaret ve Pazarlama</option>
+                              <option>Elektrik</option>
+                              <option>
+                                Hibrid ve Elektrikli Taşıtlar Teknolojileri
+                              </option>
+                              <option>
+                                İnsansız Hava Aracı Teknolojisi ve Operatörlüğü{" "}
+                              </option>
+                              <option>Lojistik</option>
+                              <option>Makine</option>
+                              <option>Mekatronik</option>
+                              <option>Silah Sanayi Teknikerliği</option>
+                            </Form.Control>
+                          </Form.Group>
                         </Row>
 
                         <Button variant="primary" onClick={handleSave}>
@@ -209,6 +243,7 @@ const BasicBadges = () => {
                     <th>Öğrenci id </th>
                     <th>Dönem</th>
                     <th>Öğretmen</th>
+                    <th>Bölüm</th>
 
                     <th>İşlemler</th>
                   </tr>
@@ -223,6 +258,7 @@ const BasicBadges = () => {
                         <td>{students[key]?.uuid}</td>
                         <td>{students[key]?.semester}</td>
                         <td>{teachers[students[key]?.teacher]?.teacher}</td>
+                        <td> {students[key]?.bolum} </td>
                         <td>
                           <Button
                             variant="danger"
