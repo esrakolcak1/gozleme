@@ -1,44 +1,97 @@
-import React from 'react';
-import NVD3Chart from 'react-nvd3';
-
-function generateNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function getDatum() {
-  // let sin = [],
-  let sin2 = [],
-    sin3 = [];
-
-  const len = 35 + Math.random() * (70 - 35);
-  for (let i = 0; i < len; i++) {
-    sin2.push({
-      x: i,
-      y: generateNumber(0, 100)
-    });
-    sin3.push({
-      x: i,
-      y: generateNumber(0, 30)
-    });
-  }
-  return [
-    {
-      values: sin3,
-      key: 'Şirketteki Çalışan Sayısı',
-      color: '#04a9f5'
-    },
-    {
-      values: sin2,
-      key: 'şirketteki Stajyer Sayısı',
-      color: '#1de9b6',
-      area: true
-    }
-  ];
-}
+import ReactEcharts from "echarts-for-react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const MultiBarChart = () => {
-  const data = getDatum();
-  return <NVD3Chart type="multiBarChart" datum={data} x="x" y="y" height={300} showValues groupSpacing={0.2} />;
+  const [chartData, setChartData] = useState({
+    kisiler: [],
+    stajyerData: [],
+    calisanData: [],
+  });
+
+  const kisileriGetir = async () => {
+    try {
+      const response = await axios.get(
+        "https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json"
+      );
+      const data = response.data;
+
+      setChartData(data);
+
+      console.log(data);
+    } catch (error) {
+      console.error("Veri alınırken bir hata oluştu:", error);
+    }
+  };
+
+  console.log("chartData", chartData);
+
+  useEffect(() => {
+    kisileriGetir();
+  }, []);
+
+  const options = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "cross",
+        crossStyle: {
+          color: "#999",
+        },
+      },
+    },
+    legend: {
+      data: ["Sirket Calisani", "Stajer"],
+    },
+    xAxis: [
+      {
+        type: "category",
+        data: Object.values(chartData).map((item) => item?.firma),
+        axisPointer: {
+          type: "shadow",
+        },
+      },
+    ],
+    yAxis: [
+      {
+        type: "value",
+        name: "Sirket Calisani",
+        min: 0,
+        axisLabel: {
+          formatter: "{value} kisi",
+        },
+      },
+      {
+        type: "value",
+        name: "Stajer",
+        min: 0,
+        axisLabel: {
+          formatter: "{value} kisi",
+        },
+      },
+    ],
+    series: [
+      {
+        name: "Sirket Calisani",
+        type: "bar",
+        data: Object.values(chartData).map((item) => item?.calisankisi),
+      },
+      {
+        name: "Stajer",
+        type: "bar",
+        data: Object.values(chartData).map((item) => item?.stajyer),
+      },
+    ],
+  };
+
+  console.log(
+    "qweqw",
+    Object.keys(chartData)?.map((key, index) => key)
+  );
+
+  return (
+    <ReactEcharts option={options} style={{ width: "100%", height: "350px" }} />
+  );
 };
 
 export default MultiBarChart;

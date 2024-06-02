@@ -83,11 +83,10 @@ const PieBasicChart = () => {
     ],
   };
 
-  console.log("bolumler", chartData);
   return (
     <ReactEcharts
       option={options}
-      style={{ width: "600px", height: "300px" }}
+      style={{ width: "600px", height: "400px" }}
     ></ReactEcharts>
   );
 };

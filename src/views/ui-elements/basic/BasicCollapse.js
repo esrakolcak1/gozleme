@@ -14,6 +14,8 @@ const BasicCollapse = () => {
     firmaTelefonu: "",
     yetkili: "",
     firmaDegerlendirmesi: 1,
+    calisankisi: "",
+    stajyer: "",
   });
   const [firmas, setFirmas] = useState({});
   const [editingIndex, setEditingIndex] = useState(null);
@@ -55,7 +57,9 @@ const BasicCollapse = () => {
       !formData.firmaAdresi ||
       !formData.firmaMaili ||
       !formData.firmaTelefonu ||
-      !formData.yetkili
+      !formData.yetkili ||
+      !formData.calisankisi ||
+      !formData.stajyer
     ) {
       setError("Lütfen tüm alanları doldurun");
       return;
@@ -71,6 +75,8 @@ const BasicCollapse = () => {
       firmaTelefonu: formData.firmaTelefonu,
       yetkili: formData.yetkili,
       firmaDegerlendirmesi: formData.firmaDegerlendirmesi,
+      calisankisi: formData.calisankisi,
+      stajyer: formData.stajyer,
     });
 
     if (editingIndex !== null) {
@@ -84,6 +90,8 @@ const BasicCollapse = () => {
       firmaTelefonu: "",
       yetkili: "",
       firmaDegerlendirmesi: 1,
+      calisankisi: "",
+      stajyer: "",
     });
 
     setEditingIndex(null);
@@ -208,6 +216,32 @@ const BasicCollapse = () => {
                               <option value={5}>5</option>
                             </Form.Control>
                           </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            as={Col}
+                            controlId="formGridCalisankisi"
+                          >
+                            <Form.Label>Çalışan Sayısı</Form.Label>
+                            <Form.Control
+                              placeholder="Çalışan sayısı giriniz"
+                              name="calisankisi"
+                              value={formData.calisankisi}
+                              onChange={handleChange}
+                            />
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            as={Col}
+                            controlId="formGridStajyer"
+                          >
+                            <Form.Label>Stajyer Sayısı</Form.Label>
+                            <Form.Control
+                              placeholder="Stajyer sayısı giriniz"
+                              name="stajyer"
+                              value={formData.stajyer}
+                              onChange={handleChange}
+                            />
+                          </Form.Group>
                         </Row>
 
                         <Button variant="primary" onClick={handleSave}>
@@ -230,7 +264,9 @@ const BasicCollapse = () => {
                     <th>Firma Maili</th>
                     <th>Firma Telefonu</th>
                     <th>Yetkili Adı ve Soyadı</th>
-                    <th>Firma Değerlendirmesi</th>
+                    <th>Firma Notu</th>
+                    {/* <th>Çalışan Sayısı</th>
+                    <th>Stajyer Sayısı</th> */}
                     <th>İşlemler</th>
                   </tr>
                 </thead>
@@ -245,7 +281,9 @@ const BasicCollapse = () => {
                         <td>{firmas[key]?.firmaMaili}</td>
                         <td>{firmas[key]?.firmaTelefonu}</td>
                         <td>{firmas[key]?.yetkili}</td>
-                        <td>{firmas[key]?.firmaDegerlendirmesi}</td>
+                        {/* <td>{firmas[key]?.firmaDegerlendirmesi}</td>
+                        <td>{firmas[key]?.calisankisi}</td> */}
+                        <td>{firmas[key]?.stajyer}</td>
                         <td>
                           <Button
                             variant="danger"

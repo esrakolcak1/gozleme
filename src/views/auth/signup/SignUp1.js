@@ -3,8 +3,9 @@ import { Card, Row, Col } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
-import { auth, firestore } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
+import { auth, firestore, db } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
 import { collection, addDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 const SignUp1 = () => {
   const [email, setEmail] = useState("");
@@ -18,27 +19,37 @@ const SignUp1 = () => {
       if (!email || !password) {
         return;
       }
-      // createUserWithEmailAndPassword(auth, email, password)
-      //   .then((userCredential) => {
-      //     const user = userCredential.user;
-      //     // Kullanıcı veritabanına rol ekleyin
-      //     db.ref("users/" + user.uid).set({
-      //       email: user.email,
-      //       role: role,
-      //     });
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          // Kullanıcı veritabanına rol ekleyin
 
-      //     alert("Kayıt oldunuz");
-      //   })
-      //   .catch((e) => {
-      //     alert(e.message);
-      //   });
-      const docRef = addDoc(collection(firestore, "userr"), {
-        name: "John",
-        age: 30,
-      });
+          setDoc(doc(firestore, "users", "LA"), {
+            name: "Los Angeles",
+            state: "CA",
+            country: "USA",
+          });
+          alert("Kayıt oldunuz");
+        })
+        .catch((e) => {
+          alert(e.message);
+        });
     },
     [email, password, role]
   );
+
+  const postDataFirestore = async (user) => {
+    // await addDoc(collection(firestore, `users/${user.uid}`), {
+    //   uid: user.uid,
+    //   email: user.email,
+    //   role: role,
+    // });
+    await setDoc(doc(firestore, "users", "LA"), {
+      name: "Los Angeles",
+      state: "CA",
+      country: "USA",
+    });
+  };
 
   return (
     <React.Fragment>

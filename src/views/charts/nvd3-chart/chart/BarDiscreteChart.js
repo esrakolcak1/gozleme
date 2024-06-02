@@ -1,56 +1,97 @@
-import React from 'react';
-import NVD3Chart from 'react-nvd3';
-
-const datum = [
-  {
-    key: 'Cumulative Return',
-    values: [
-      {
-        label: 'A',
-        value: -29.765957771107,
-        color: '#3ebfea'
-      },
-      {
-        label: 'B',
-        value: 10,
-        color: '#04a9f5'
-      },
-      {
-        label: 'C',
-        value: 32.807804682612,
-        color: '#ff8a65'
-      },
-      {
-        label: 'D',
-        value: 196.45946739256,
-        color: '#1de9b6'
-      },
-      {
-        label: 'E',
-        value: 0.25434030906893,
-        color: '#4C5667'
-      },
-      {
-        label: 'F',
-        value: -98.079782601442,
-        color: '#69CEC6'
-      },
-      {
-        label: 'G',
-        value: -13.925743130903,
-        color: '#a389d4'
-      },
-      {
-        label: 'H',
-        value: -5.1387322875705,
-        color: '#FE8A7D'
-      }
-    ]
-  }
-];
+import ReactEcharts from "echarts-for-react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const BarDiscreteChart = () => {
-  return <NVD3Chart tooltip={{ enabled: true }} type="discreteBarChart" datum={datum} x="label" y="value" height={300} showValues />;
+  const [ogrenciler, setOgrenciler] = useState([]);
+  const [ogretmenler, setOgretmenler] = useState([]);
+  const [firmalar, setFirmalar] = useState([]);
+  const [hamiler, setHamiler] = useState([]);
+
+  const ogrencileriGetir = async () => {
+    try {
+      const response = await axios.get(
+        "https://gozleme-cc975-default-rtdb.firebaseio.com/students.json"
+      );
+      setOgrenciler(response?.data || []);
+    } catch (error) {
+      console.error("Öğrenci verileri alınırken bir hata oluştu:", error);
+    }
+  };
+
+  const ogretmenleriGetir = async () => {
+    try {
+      const response = await axios.get(
+        "https://gozleme-cc975-default-rtdb.firebaseio.com/teachers.json"
+      );
+      setOgretmenler(response?.data || []);
+    } catch (error) {
+      console.error("Öğretmen verileri alınırken bir hata oluştu:", error);
+    }
+  };
+
+  const firmalariGetir = async () => {
+    try {
+      const response = await axios.get(
+        "https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json"
+      );
+      setFirmalar(response?.data || []);
+    } catch (error) {
+      console.error("Firma verileri alınırken bir hata oluştu:", error);
+    }
+  };
+
+  const hamileriGetir = async () => {
+    try {
+      const response = await axios.get(
+        "https://gozleme-cc975-default-rtdb.firebaseio.com/hamis.json"
+      );
+      setHamiler(response?.data || []);
+    } catch (error) {
+      console.error("Hami verileri alınırken bir hata oluştu:", error);
+    }
+  };
+
+  useEffect(() => {
+    ogrencileriGetir();
+    ogretmenleriGetir();
+    firmalariGetir();
+    hamileriGetir();
+  }, []);
+
+  const option = {
+    xAxis: {
+      type: "category",
+      data: ["Hami", "Ogretmen", "Ogrenci", "Firma"],
+    },
+    legend: {
+      data: ["Hami", "Ogretmen", "Ogrenci", "Firma"],
+    },
+    yAxis: {
+      type: "value",
+    },
+    series: [
+      {
+        data: [
+          Object.keys(hamiler).length,
+          Object.keys(ogretmenler).length,
+          Object.keys(ogrenciler).length,
+          Object.keys(firmalar).length,
+        ],
+        type: "bar",
+      },
+    ],
+  };
+
+  return (
+    <ReactEcharts option={option} style={{ width: "100%", height: "400px" }} />
+  );
 };
 
 export default BarDiscreteChart;
+// data: [
+//   Object.keys(ogrenciler).length,
+//   Object.keys(ogretmenler).length,
+//   Object.keys(firmalar).length,
+//   Object.keys(hamiler).length,
+// ],

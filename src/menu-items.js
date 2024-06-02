@@ -76,31 +76,6 @@ const menuItems = {
       type: "group",
       icon: "icon-pages",
       children: [
-        // {
-        //   id: "auth",
-        //   title: "Authentication",
-        //   type: "collapse",
-        //   icon: "feather icon-lock",
-        //   children: [
-        //     {
-        //       id: "signup-1",
-        //       title: "Kayıt Ol",
-        //       type: "item",
-        //       url: "/auth/signup-1",
-        //       target: true,
-        //       breadcrumbs: false,
-        //     },
-        //     {
-        //       id: "signin-1",
-        //       title: "Giriş Yap",
-        //       type: "item",
-        //       url: "/auth/signin-1",
-        //       target: true,
-        //       breadcrumbs: false,
-        //     },
-        //   ],
-        // },
-
         {
           id: "documentation",
           title: "Ostim Teknik Üniversitesi",
