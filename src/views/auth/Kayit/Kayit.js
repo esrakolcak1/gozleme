@@ -26,7 +26,7 @@ const SignUp1 = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault(); // sayfa yenilenmesini önleme
-      console.log("email", email, "password", password, "role", role);
+     
       if (!email || !password) {
         return;
       }
@@ -37,7 +37,7 @@ const SignUp1 = () => {
 
           postDataFirestore(user);
           alert("Kayıt oldunuz");
-          console.log("user", user);
+       
         })
         .catch((e) => {
           alert(e.message);

@@ -23,9 +23,18 @@ const FirebaseLogin = ({ className, ...rest }) => {
   };
 
   const getUserRoleControl = (user) => {
-    let admin = students.filter((item) => {
-      console.log("item");
-    });
+
+   
+    let adminControl = students.find((item) => item.email == user ?  true : false); 
+
+    if (adminControl) {
+      localStorage.setItem("user", JSON.stringify({ email: user, role: "admin" }));
+    } else {
+      localStorage.setItem("user", JSON.stringify({ email: user, role: "user" }));
+    }
+
+    navigate("/app/anasayfa/anasayfa");
+    
   };
 
   useEffect(() => {
@@ -69,9 +78,9 @@ const FirebaseLogin = ({ className, ...rest }) => {
 
             getUserRoleControl(user?.email);
 
-            navigate("/app/anasayfa/anasayfa"); // Giriş başarılıysa yönlendir
+            // navigate("/app/anasayfa/anasayfa"); // Giriş başarılıysa yönlendir
           } catch (error) {
-            console.log("error", error);
+       
             if (
               error.code === "auth/wrong-password" ||
               error.code === "auth/user-not-found"
@@ -81,7 +90,7 @@ const FirebaseLogin = ({ className, ...rest }) => {
               setErrors({ submit: "Kullanıcı adı veya şifre yanlış." });
             }
             setSubmitting(false);
-            console.log("error", error);
+          
           }
         }}
       >

@@ -15,14 +15,14 @@ const CalisanStajyer = () => {
           ...doc.data(),
           id: doc.id,
         }));
-        console.log("NEW DATA", newData, calisan, stajyer);
+       
 
         newData.map((e) => {
           calisan.pu;
           setCalisan(...calisan, Number(e.calisankisi));
           setStajyer(...stajyer, Number(e.stajyer));
         });
-        console.log("NEW DATA", calisan, stajyer);
+    
         setFirmas(newData);
       });
     } catch (error) {

@@ -16,11 +16,11 @@ const EklentiTablosu = () => {
         id: doc.id,
       }));
       setStudents(newData);
-      console.log(ogrenciler, newData);
+
     });
   };
 
-  console.log("students", ogrenciler);
+
 
   const ogretmenleriGetir = async () => {
     try {

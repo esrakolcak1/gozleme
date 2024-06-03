@@ -17,7 +17,7 @@ const Anasayfa = () => {
         ...doc.data(),
       }));
       setUsers(fetchedUsers);
-      console.log("fetchedUsers:", users); // Verileri konsola yazdır
+   
     } catch (error) {
       console.error("Firestore verileri alınırken hata oluştu:", error);
     }

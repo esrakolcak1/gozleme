@@ -26,6 +26,7 @@ const menuItems = {
           title: "Katagoriler",
           type: "collapse",
           icon: "feather icon-box",
+          
           children: [
             {
               id: "breadcrumb",

@@ -12,6 +12,7 @@ const NavRight = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth); // Firebase çıkış işlemi
+      localStorage.removeItem("user"); // Kullanıcı bilgilerini yerel depodan kaldırın
       navigate("/fireabasegiris"); // Çıkış yaptıktan sonra yönlendirilecek sayfa
     } catch (error) {
       console.error("Çıkış işlemi sırasında hata oluştu: ", error);

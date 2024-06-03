@@ -306,9 +306,11 @@ const Ziyaret = () => {
                 <tbody>
                   {ziyarets.length > 0 ? (
                     ziyarets.map((ziyaret, index) => (
+
+                     
                       <tr key={index}>
                         <th>{index + 1}</th>
-                        <td>{ziyaret.uuid}</td>
+                        <td>{ziyaret.id}</td>
                         <td>{teachers[ziyaret.teacher]?.teacher}</td>
                         <td>{students[ziyaret.number]?.name}</td>
                         <td>{firmas[ziyaret.firma]?.firma}</td>
