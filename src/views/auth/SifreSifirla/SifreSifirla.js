@@ -59,7 +59,7 @@ const ResetPassword1 = () => {
                   </form>
                   <p className="mb-0 text-muted">
                     Tekrardan{" "}
-                    <NavLink to="/auth/signin-1" className="f-w-400">
+                    <NavLink to="/auth/giris" className="f-w-400">
                       Giriş Yap
                     </NavLink>
                   </p>

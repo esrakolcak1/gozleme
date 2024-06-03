@@ -1,30 +1,38 @@
 import ReactEcharts from "echarts-for-react";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { collection, getDocs } from "firebase/firestore";
+import { firestore } from "../../../../firebase/firebaseConfig";
 
-const BarDiscreteChart = () => {
-  const [ogrenciler, setOgrenciler] = useState([]);
-  const [ogretmenler, setOgretmenler] = useState([]);
-  const [firmalar, setFirmalar] = useState([]);
-  const [hamiler, setHamiler] = useState([]);
+const EklentiTablosu = () => {
+  const [ogrenciler, setStudents] = useState([]);
+  const [ogretmenler, setTeachers] = useState([]);
+  const [firmalar, setFirmas] = useState([]);
+  const [hamiler, setHamis] = useState([]);
 
   const ogrencileriGetir = async () => {
-    try {
-      const response = await axios.get(
-        "https://gozleme-cc975-default-rtdb.firebaseio.com/students.json"
-      );
-      setOgrenciler(response?.data || []);
-    } catch (error) {
-      console.error("Öğrenci verileri alınırken bir hata oluştu:", error);
-    }
+    await getDocs(collection(firestore, "students")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setStudents(newData);
+      console.log(ogrenciler, newData);
+    });
   };
+
+  console.log("students", ogrenciler);
 
   const ogretmenleriGetir = async () => {
     try {
-      const response = await axios.get(
-        "https://gozleme-cc975-default-rtdb.firebaseio.com/teachers.json"
+      const response = await getDocs(collection(firestore, "teachers")).then(
+        (querySnapshot) => {
+          const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          setTeachers(newData);
+        }
       );
-      setOgretmenler(response?.data || []);
     } catch (error) {
       console.error("Öğretmen verileri alınırken bir hata oluştu:", error);
     }
@@ -32,10 +40,15 @@ const BarDiscreteChart = () => {
 
   const firmalariGetir = async () => {
     try {
-      const response = await axios.get(
-        "https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json"
+      const response = await getDocs(collection(firestore, "firmas")).then(
+        (querySnapshot) => {
+          const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          setFirmas(newData);
+        }
       );
-      setFirmalar(response?.data || []);
     } catch (error) {
       console.error("Firma verileri alınırken bir hata oluştu:", error);
     }
@@ -43,10 +56,15 @@ const BarDiscreteChart = () => {
 
   const hamileriGetir = async () => {
     try {
-      const response = await axios.get(
-        "https://gozleme-cc975-default-rtdb.firebaseio.com/hamis.json"
+      const response = await getDocs(collection(firestore, "hamis")).then(
+        (querySnapshot) => {
+          const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          setHamis(newData);
+        }
       );
-      setHamiler(response?.data || []);
     } catch (error) {
       console.error("Hami verileri alınırken bir hata oluştu:", error);
     }
@@ -88,7 +106,7 @@ const BarDiscreteChart = () => {
   );
 };
 
-export default BarDiscreteChart;
+export default EklentiTablosu;
 // data: [
 //   Object.keys(ogrenciler).length,
 //   Object.keys(ogretmenler).length,

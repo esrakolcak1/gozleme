@@ -1,11 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, Form, Button, Alert } from "react-bootstrap";
-import { db } from "../../../firebase/firebaseConfig";
+import { auth, firestore } from "../../../firebase/firebaseConfig";
 import { uid } from "uid";
-import { set, ref, remove } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
-const BasicBadges = () => {
+const Ogrenci = () => {
   const [showOgrenciForm, setShowOgrenciForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -13,6 +21,8 @@ const BasicBadges = () => {
     semester: "",
     teacher: "",
     bolum: "",
+    mail: "",
+    sifre: "",
   });
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState({});
@@ -20,19 +30,23 @@ const BasicBadges = () => {
   const [error, setError] = useState(null);
 
   const getStudentData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/students.json")
-      .then((response) => {
-        setStudents(response?.data);
-      });
+    await getDocs(collection(firestore, "students")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setStudents(newData);
+    });
   };
 
   const getTeacherData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/teachers.json")
-      .then((response) => {
-        setTeachers(response?.data);
-      });
+    await getDocs(collection(firestore, "teachers")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setTeachers(newData);
+    });
   };
 
   useEffect(() => {
@@ -57,14 +71,16 @@ const BasicBadges = () => {
     setError(null); // Değişiklik yapıldığında hatayı sıfırla
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Boş alan kontrolü
     if (
       !formData.name ||
       !formData.number ||
       !formData.semester ||
       !formData.teacher ||
-      !formData.bolum
+      !formData.bolum ||
+      !formData.mail ||
+      !formData.sifre
     ) {
       setError("Lütfen tüm alanları doldurun");
       return;
@@ -72,17 +88,50 @@ const BasicBadges = () => {
 
     const uuid = editingIndex !== null ? editingIndex : uid();
 
-    set(ref(db, `students/${uuid}`), {
-      uuid,
-      name: formData.name,
-      numbers: formData.number,
-      semester: formData.semester,
-      teacher: formData.teacher,
-      bolum: formData.bolum,
-    });
-
     if (editingIndex !== null) {
-      remove(ref(db, `students/${editingIndex}`));
+      const docRef = doc(firestore, "students", editingIndex);
+      await updateDoc(docRef, {
+        uuid,
+        name: formData.name,
+        numbers: formData.number,
+        semester: formData.semester,
+        teacher: formData.teacher,
+        bolum: formData.bolum,
+        mail: formData.mail,
+        sifre: formData.sifre,
+      });
+    } else {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.mail,
+          formData.sifre
+        );
+        const user = userCredential.user;
+        alert("Kayıt oldunuz");
+      } catch (e) {
+        alert(e.message);
+      }
+
+      await addDoc(collection(firestore, "students"), {
+        uuid,
+        name: formData.name,
+        numbers: formData.number,
+        semester: formData.semester,
+        teacher: formData.teacher,
+        bolum: formData.bolum,
+        mail: formData.mail,
+        sifre: formData.sifre,
+      });
+
+      // await createUserWithEmailAndPassword(auth, formData.mail, formData.sifre)
+      //   .then((userCredential) => {
+      //     const user = userCredential.user;
+      //     alert("Kayıt oldunuz");
+      //   })
+      //   .catch((e) => {
+      //     alert(e.message);
+      //   });
     }
 
     setFormData({
@@ -91,6 +140,8 @@ const BasicBadges = () => {
       semester: "",
       teacher: "",
       bolum: "",
+      mail: "",
+      sifre: "",
     });
 
     setEditingIndex(null);
@@ -98,19 +149,17 @@ const BasicBadges = () => {
     getStudentData();
   };
 
-  const handleDelete = (id) => {
-    remove(ref(db, `students/${id}`));
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(firestore, "students", id));
     getStudentData();
   };
 
-  const handleEdit = (key) => {
-    const student = students[key];
+  const handleEdit = (id) => {
+    const student = students.find((s) => s.id === id);
     setFormData(student);
-    setEditingIndex(key);
+    setEditingIndex(id);
     toggleOgrenciFormVisibility();
   };
-
-  const keys = students != null ? Object.keys(students) : [];
 
   return (
     <React.Fragment>
@@ -121,7 +170,7 @@ const BasicBadges = () => {
               <Card.Title as="h5">ÖĞRENCİ</Card.Title>
               <div className="ekle">
                 <Button onClick={toggleOgrenciFormVisibility}>
-                  {showOgrenciForm ? "Formu Kapat" : "Eşleşme Bilgilerini Ekle"}
+                  {showOgrenciForm ? "Formu Kapat" : "Öğrenci Ekle"}
                 </Button>
                 {showOgrenciForm && (
                   <div>
@@ -178,7 +227,7 @@ const BasicBadges = () => {
                           >
                             <Form.Label>Öğretmen</Form.Label>
                             <Form.Control
-                              as="select" // select elementine dönüştürüldü
+                              as="select"
                               name="teacher"
                               value={formData.teacher}
                               onChange={handleChange}
@@ -214,13 +263,37 @@ const BasicBadges = () => {
                                 Hibrid ve Elektrikli Taşıtlar Teknolojileri
                               </option>
                               <option>
-                                İnsansız Hava Aracı Teknolojisi ve Operatörlüğü{" "}
+                                İnsansız Hava Aracı Teknolojisi ve Operatörlüğü
                               </option>
                               <option>Lojistik</option>
                               <option>Makine</option>
                               <option>Mekatronik</option>
                               <option>Silah Sanayi Teknikerliği</option>
                             </Form.Control>
+                          </Form.Group>
+                          <Form.Group className="mb-3" controlId="formGridMail">
+                            <Form.Label>Öğrenci Mail</Form.Label>
+                            <Form.Control
+                              type="email"
+                              placeholder="Öğrenci mail adresi giriniz"
+                              name="mail"
+                              value={formData.mail}
+                              onChange={handleChange}
+                            />
+                          </Form.Group>
+
+                          <Form.Group
+                            className="mb-3"
+                            controlId="formGridSifre"
+                          >
+                            <Form.Label>Şifre</Form.Label>
+                            <Form.Control
+                              type="password"
+                              placeholder="Şifre giriniz"
+                              name="sifre"
+                              value={formData.sifre}
+                              onChange={handleChange}
+                            />
                           </Form.Group>
                         </Row>
 
@@ -244,31 +317,30 @@ const BasicBadges = () => {
                     <th>Dönem</th>
                     <th>Öğretmen</th>
                     <th>Bölüm</th>
-
                     <th>İşlemler</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    Object.keys(students)?.map((key, index) => (
+                  {students.length > 0 ? (
+                    students.map((student, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{students[key]?.name}</td>
-                        <td>{students[key]?.numbers}</td>
-                        <td>{students[key]?.uuid}</td>
-                        <td>{students[key]?.semester}</td>
-                        <td>{teachers[students[key]?.teacher]?.teacher}</td>
-                        <td> {students[key]?.bolum} </td>
+                        <td>{student.name}</td>
+                        <td>{student.numbers}</td>
+                        <td>{student.uuid}</td>
+                        <td>{student.semester}</td>
+                        <td>{teachers[student.teacher]?.teacher}</td>
+                        <td>{student.bolum}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(student.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(student.id)}
                           >
                             Düzenle
                           </Button>
@@ -277,7 +349,7 @@ const BasicBadges = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6">Veri bulunmamaktadır</td>
+                      <td colSpan="8">Veri bulunmamaktadır</td>
                     </tr>
                   )}
                 </tbody>
@@ -290,4 +362,4 @@ const BasicBadges = () => {
   );
 };
 
-export default BasicBadges;
+export default Ogrenci;

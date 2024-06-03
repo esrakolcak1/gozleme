@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Card, Row, Col } from "react-bootstrap";
+import { Card, Row, Col, Form } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
@@ -11,6 +11,17 @@ const SignUp1 = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user"); // Varsayılan rol olarak 'user'
+
+  const roles = [
+    {
+      label: "Admin",
+      value: "admin",
+    },
+    {
+      label: "Kullanıcı",
+      value: "user",
+    },
+  ];
 
   const handleSubmit = useCallback(
     (e) => {
@@ -24,12 +35,9 @@ const SignUp1 = () => {
           const user = userCredential.user;
           // Kullanıcı veritabanına rol ekleyin
 
-          setDoc(doc(firestore, "users", "LA"), {
-            name: "Los Angeles",
-            state: "CA",
-            country: "USA",
-          });
+          postDataFirestore(user);
           alert("Kayıt oldunuz");
+          console.log("user", user);
         })
         .catch((e) => {
           alert(e.message);
@@ -39,15 +47,10 @@ const SignUp1 = () => {
   );
 
   const postDataFirestore = async (user) => {
-    // await addDoc(collection(firestore, `users/${user.uid}`), {
-    //   uid: user.uid,
-    //   email: user.email,
-    //   role: role,
-    // });
-    await setDoc(doc(firestore, "users", "LA"), {
-      name: "Los Angeles",
-      state: "CA",
-      country: "USA",
+    await addDoc(collection(firestore, `rolekontrol`), {
+      uid: user?.uid,
+      email: email,
+      role: role,
     });
   };
 
@@ -90,13 +93,30 @@ const SignUp1 = () => {
                       />
                     </div>
                     <div className="input-group mb-4">
-                      <input
+                      {/* <input
                         type="text"
                         className="form-control"
                         placeholder="Rol (Varsayılan: user)"
                         value={role}
                         onChange={(e) => setRole(e.currentTarget.value)}
-                      />
+                      /> */}
+
+                      <Form.Control
+                        as="select"
+                        name="roles"
+                        value={role}
+                        onChange={(e) => {
+                          setRole(e.target.value);
+                        }}
+                      >
+                        <option value="">Öğretmen seçiniz</option>
+                        {roles &&
+                          Object.keys(roles).map((key) => (
+                            <option key={key} value={key.value}>
+                              {roles[key].label}
+                            </option>
+                          ))}
+                      </Form.Control>
                     </div>
                     <button type="submit" className="btn btn-primary mb-4">
                       Kayıt Ol
@@ -104,7 +124,7 @@ const SignUp1 = () => {
                   </form>
                   <p className="mb-2">
                     Zaten bir hesabın var mı?{" "}
-                    <NavLink to="/auth/signin-1" className="f-w-400">
+                    <NavLink to="/auth/giris" className="f-w-400">
                       Giriş Yap
                     </NavLink>
                   </p>

@@ -1,14 +1,36 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
+import { auth, db, firestore } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
+import { addDoc, collection, getDocs } from "firebase/firestore";
 
 const FirebaseLogin = ({ className, ...rest }) => {
   const navigate = useNavigate();
+
+  const [students, setStudents] = useState([]);
+
+  const getUserForRole = async () => {
+    const querySnapshot = await getDocs(collection(firestore, "rolekontrol"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setStudents(newData);
+  };
+
+  const getUserRoleControl = (user) => {
+    let admin = students.filter((item) => {
+      console.log("item");
+    });
+  };
+
+  useEffect(() => {
+    getUserForRole();
+  }, []);
 
   return (
     <React.Fragment>
@@ -34,15 +56,22 @@ const FirebaseLogin = ({ className, ...rest }) => {
             );
             const user = userCredential.user;
 
-            // Kullanıcının rolünü al
-            const roleSnapshot = await db
-              .ref("users/" + user.uid + "/role")
-              .once("value");
-            const role = roleSnapshot.val();
+            if (user) {
+              await addDoc(collection(firestore, `user`), {
+                uuid: user.uid,
+                sonGirisTarihi: user?.metadata.lastSignInTime,
+                kayitTarihi: user?.metadata?.creationTime,
 
-            alert(`Giriş başarılı! Rol: ${role}`);
-            navigate("/app/dashboard/default"); // Giriş başarılıysa yönlendir
+                mail: user?.email,
+              });
+            } else {
+            }
+
+            getUserRoleControl(user?.email);
+
+            navigate("/app/anasayfa/anasayfa"); // Giriş başarılıysa yönlendir
           } catch (error) {
+            console.log("error", error);
             if (
               error.code === "auth/wrong-password" ||
               error.code === "auth/user-not-found"
@@ -52,6 +81,7 @@ const FirebaseLogin = ({ className, ...rest }) => {
               setErrors({ submit: "Kullanıcı adı veya şifre yanlış." });
             }
             setSubmitting(false);
+            console.log("error", error);
           }
         }}
       >

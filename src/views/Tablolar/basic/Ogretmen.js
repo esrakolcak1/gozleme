@@ -1,12 +1,20 @@
-// src/components/TeacherComponent.js
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, Form, Button, Alert } from "react-bootstrap";
-import { db } from "../../../firebase/firebaseConfig";
+import { auth, db, firestore } from "../../../firebase/firebaseConfig";
 import { uid } from "uid";
 import { set, ref, remove } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
-const TeacherComponent = () => {
+const Ogretmen = () => {
   const [showTeacherForm, setShowTeacherForm] = useState(false);
   const [formData, setFormData] = useState({
     teacher: "",
@@ -18,17 +26,17 @@ const TeacherComponent = () => {
   const [error, setError] = useState(null);
 
   const getTeacherData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/teachers.json")
-      .then((response) => {
-        console.log(response);
-        setTeachers(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "teachers"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setTeachers(newData);
   };
 
   useEffect(() => {
     getTeacherData();
-  }, [teachers]);
+  }, []);
 
   const toggleTeacherFormVisibility = () => {
     setShowTeacherForm(!showTeacherForm);
@@ -40,43 +48,69 @@ const TeacherComponent = () => {
     setError(null); // Değişiklik yapıldığında hatayı sıfırla
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Boş alan kontrolü
     if (!formData.teacher || !formData.mail || !formData.sifre) {
       setError("Lütfen tüm alanları doldurun");
       return;
     }
-    const uuid = uid();
+    const uuid = editingIndex !== null ? editingIndex : uid();
 
-    set(ref(db, `teachers/${uuid}`), {
-      uuid,
-      teacher: formData.teacher,
-      mail: formData.mail,
-      sifre: formData.sifre,
-    });
+    if (editingIndex !== null) {
+      const docRef = doc(firestore, "teachers", editingIndex);
+      await updateDoc(docRef, {
+        uuid,
+        teacher: formData.teacher,
+        mail: formData.mail,
+        sifre: formData.sifre,
+      });
+    } else {
+      await addDoc(collection(firestore, "teachers"), {
+        uuid,
+        teacher: formData.teacher,
+        mail: formData.mail,
+        sifre: formData.sifre,
+      });
+
+      await addDoc(collection(firestore, `rolekontrol`), {
+        uuid,
+        email: formData.mail,
+        role: "Admin",
+      });
+
+      createUserWithEmailAndPassword(auth, formData.mail, formData.sifre)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          // Kullanıcı veritabanına rol ekleyin
+
+          alert("Kayıt oldunuz");
+        })
+        .catch((e) => {
+          alert(e.message);
+        });
+    }
 
     setFormData({
       teacher: "",
       mail: "",
       sifre: "",
     });
+    setEditingIndex(null);
     toggleTeacherFormVisibility();
     getTeacherData();
   };
 
-  const handleDelete = (id) => {
-    remove(ref(db, `teachers/${id}`));
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(firestore, "teachers", id));
     getTeacherData();
   };
 
-  const handleEdit = (key) => {
-    const teacher = teachers[key];
+  const handleEdit = (id) => {
+    const teacher = teachers.find((s) => s.id === id);
     setFormData(teacher);
-    setEditingIndex(key);
+    setEditingIndex(id);
     toggleTeacherFormVisibility();
   };
-
-  const keys = teachers != null ? Object.keys(teachers) : [];
 
   return (
     <React.Fragment>
@@ -149,25 +183,24 @@ const TeacherComponent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
+                  {teachers.length > 0 ? (
+                    teachers.map((teacher, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{teachers[key]?.uuid}</td>
-                        <td>{teachers[key]?.teacher}</td>
-                        <td>{teachers[key]?.mail}</td>
-                        <td>{teachers[key]?.sifre}</td>
-
+                        <td>{teacher.uuid}</td>
+                        <td>{teacher.teacher}</td>
+                        <td>{teacher.mail}</td>
+                        <td>{teacher.sifre}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(teacher.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(teacher.id)}
                           >
                             Düzenle
                           </Button>
@@ -189,4 +222,4 @@ const TeacherComponent = () => {
   );
 };
 
-export default TeacherComponent;
+export default Ogretmen;

@@ -1,10 +1,10 @@
 import React from "react";
 import { Row, Col, Card } from "react-bootstrap";
 
-import BarDiscreteChart from "./chart/BarDiscreteChart";
+import EklentiTablosu from "./Tablo/EklentiTablosu";
 
-import PieBasicChart from "./chart/PieBasicChart";
-import MultiBarChart from "./chart/MultiBarChart";
+import BolumlerTablosu from "./Tablo/BolumlerTablosu";
+import CalisanStajyer from "./Tablo/CalisanStajyer";
 
 const Nvd3Chart = () => {
   return (
@@ -13,30 +13,30 @@ const Nvd3Chart = () => {
         <Col md={6}>
           <Card>
             <Card.Header>
-              <Card.Title as="h5">Pie Basic Chart</Card.Title>
+              <Card.Title as="h5"> Bölümler Tablosu</Card.Title>
             </Card.Header>
             <Card.Body className="text-center">
-              <PieBasicChart />
+              <BolumlerTablosu />
             </Card.Body>
           </Card>
         </Col>
         <Col md={6}>
           <Card>
             <Card.Header>
-              <Card.Title as="h5">Discrete Bar Chart</Card.Title>
+              <Card.Title as="h5">Eklenti Tablosu</Card.Title>
             </Card.Header>
             <Card.Body>
-              <BarDiscreteChart />
+              <EklentiTablosu />
             </Card.Body>
           </Card>
         </Col>
         <Col sm={12}>
           <Card>
             <Card.Header>
-              <Card.Title as="h5">Stacked/Grouped Multi-Bar Chart</Card.Title>
+              <Card.Title as="h5">Çalısan ve Stajyer Tablosu</Card.Title>
             </Card.Header>
             <Card.Body>
-              <MultiBarChart />
+              <CalisanStajyer />
             </Card.Body>
           </Card>
         </Col>

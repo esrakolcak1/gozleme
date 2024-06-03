@@ -1,11 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, Form, Button, Alert } from "react-bootstrap";
-import { db } from "../../../firebase/firebaseConfig";
+import { db, firestore } from "../../../firebase/firebaseConfig";
 import { uid } from "uid";
 import { set, ref, remove } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
-const BasicTypography = () => {
+const Ziyaret = () => {
   const [showZiyaretForm, setShowZiyaretForm] = useState(false);
   const [formData, setFormData] = useState({
     teacher: "",
@@ -27,43 +35,53 @@ const BasicTypography = () => {
   const [error, setError] = useState(null);
 
   const getZiyaretData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/ziyarets.json")
-      .then((response) => {
-        setZiyarets(response?.data || {});
-      });
+    await getDocs(collection(firestore, "ziyarets")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setZiyarets(newData);
+    });
   };
 
   const getTeacherData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/teachers.json")
-      .then((response) => {
-        setTeachers(response?.data || {});
-      });
+    await getDocs(collection(firestore, "teachers")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setTeachers(newData);
+    });
   };
 
   const getHamiData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/hamis.json")
-      .then((response) => {
-        setHamis(response?.data || {});
-      });
+    await getDocs(collection(firestore, "hamis")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setHamis(newData);
+    });
   };
 
   const getStudentData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/students.json")
-      .then((response) => {
-        setStudents(response?.data || {});
-      });
+    await getDocs(collection(firestore, "students")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setStudents(newData);
+    });
   };
 
   const getFirmaData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json")
-      .then((response) => {
-        setFirmas(response?.data || {});
-      });
+    await getDocs(collection(firestore, "firmas")).then((querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setFirmas(newData);
+    });
   };
 
   useEffect(() => {
@@ -83,7 +101,8 @@ const BasicTypography = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(null); // Değişiklik yapıldığında hatayı sıfırla
   };
-  const handleAdd = () => {
+
+  const handleSave = async () => {
     if (
       !formData.teacher ||
       !formData.number ||
@@ -100,52 +119,65 @@ const BasicTypography = () => {
     }
     const uuid = editingIndex !== null ? editingIndex : uid();
 
-    set(ref(db, `ziyarets/${uuid}`), {
-      uuid,
-      teacher: formData.teacher,
-      number: formData.number,
-      hami: formData.hami,
-      firma: formData.firma,
-      ziyaretturu: formData.ziyaretturu,
-      ziyaretgorusu: formData.ziyaretgorusu,
-      resim: formData.resim,
-      not: formData.not,
-      tarih: formData.tarih,
-    });
-
     if (editingIndex !== null) {
-      remove(ref(db, `ziyarets/${editingIndex}`));
+      const docRef = doc(firestore, "students", editingIndex);
+      await updateDoc(docRef, {
+        uuid,
+        teacher: formData.teacher,
+        number: formData.number,
+        hami: formData.hami,
+        firma: formData.firma,
+        ziyaretturu: formData.ziyaretturu,
+        ziyaretgorusu: formData.ziyaretgorusu,
+        resim: formData.resim,
+        not: formData.not,
+        tarih: formData.tarih,
+      });
+    } else {
+      await addDoc(collection(firestore, `ziyarets`), {
+        teacher: formData.teacher,
+        number: formData.number,
+        hami: formData.hami,
+        firma: formData.firma,
+        ziyaretturu: formData.ziyaretturu,
+        ziyaretgorusu: formData.ziyaretgorusu,
+        resim: formData.resim,
+        not: formData.not,
+        tarih: formData.tarih,
+      });
+
+      if (editingIndex !== null) {
+        remove(ref(db, `ziyarets/${editingIndex}`));
+      }
+
+      setFormData({
+        teacher: "",
+        number: "",
+        hami: "",
+        firma: "",
+        ziyaretturu: "",
+        ziyaretgorusu: "",
+        resim: "",
+        not: "",
+        tarih: "",
+      });
+      setEditingIndex(null);
+      toggleZiyaretFormVisibility();
+      getZiyaretData();
     }
+  };
 
-    setFormData({
-      teacher: "",
-      number: "",
-      hami: "",
-      firma: "",
-      ziyaretturu: "",
-      ziyaretgorusu: "",
-      resim: "",
-      not: "",
-      tarih: "",
-    });
-    setEditingIndex(null);
-    toggleZiyaretFormVisibility();
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(firestore, "ziyarets", id));
     getZiyaretData();
   };
 
-  const handleDelete = (id) => {
-    remove(ref(db, `ziyarets/${id}`));
-    getZiyaretData();
-  };
-
-  const handleEdit = (key) => {
-    const ziyaret = ziyarets[key];
+  const handleEdit = (id) => {
+    const ziyaret = ziyarets.find((s) => s.id === id);
     setFormData(ziyaret);
-    setEditingIndex(key);
+    setEditingIndex(id);
     toggleZiyaretFormVisibility();
   };
-
-  const keys = ziyarets != null ? Object.keys(ziyarets) : [];
 
   return (
     <React.Fragment>
@@ -194,26 +226,16 @@ const BasicTypography = () => {
                             <Form.Control
                               as="select"
                               name="number"
-                              value={formData.number} // Değiştirildi
+                              value={formData.number}
                               onChange={handleChange}
                             >
                               <option value="">Öğrenci seçiniz</option>
                               {students &&
-                                Object.keys(students).map(
-                                  (key) => (
-                                    console.log("key", key),
-                                    (
-                                      <option
-                                        key={key}
-                                        value={students[key].number}
-                                      >
-                                        {" "}
-                                        {/* Değiştirildi */}
-                                        {students[key].name}
-                                      </option>
-                                    )
-                                  )
-                                )}
+                                Object.keys(students).map((key) => (
+                                  <option key={key} value={key}>
+                                    {students[key].name}
+                                  </option>
+                                ))}
                             </Form.Control>
                           </Form.Group>
                           <Form.Group
@@ -259,7 +281,7 @@ const BasicTypography = () => {
                             </Form.Control>
                           </Form.Group>
                         </Row>
-                        <Button variant="primary" onClick={handleAdd}>
+                        <Button variant="primary" onClick={handleSave}>
                           {editingIndex !== null ? "DÜZENLE" : "EKLE"}
                         </Button>
                       </Form>
@@ -282,25 +304,25 @@ const BasicTypography = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
-                      <tr key={key}>
-                        <th scope="row">{index + 1}</th>
-                        <td>{key}</td>
-                        <td>{teachers[ziyarets[key]?.teacher]?.teacher}</td>
-                        <td>{students[ziyarets[key]?.number]?.number}</td>
-                        <td>{firmas[ziyarets[key]?.firma]?.firma}</td>
-                        <td>{hamis[ziyarets[key]?.hami]?.name}</td>
+                  {ziyarets.length > 0 ? (
+                    ziyarets.map((ziyaret, index) => (
+                      <tr key={index}>
+                        <th>{index + 1}</th>
+                        <td>{ziyaret.uuid}</td>
+                        <td>{teachers[ziyaret.teacher]?.teacher}</td>
+                        <td>{students[ziyaret.number]?.name}</td>
+                        <td>{firmas[ziyaret.firma]?.firma}</td>
+                        <td>{hamis[ziyaret.hami]?.name}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(ziyaret.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="info"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(ziyaret.id)}
                           >
                             Düzenle
                           </Button>
@@ -377,7 +399,7 @@ const BasicTypography = () => {
                           />
                         </Form.Group>
                       </Row>
-                      <Button variant="primary" onClick={handleAdd}>
+                      <Button variant="primary" onClick={handleSave}>
                         {editingIndex !== null ? "DÜZENLE" : "EKLE"}
                       </Button>
                     </Form>
@@ -397,23 +419,23 @@ const BasicTypography = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
+                  {ziyarets?.length > 0 ? (
+                    ziyarets.map((ziyaret, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{ziyarets[key]?.ziyaretturu}</td>
-                        <td>{ziyarets[key]?.ziyaretgorusu}</td>
-                        <td>{ziyarets[key]?.resim}</td>
+                        <td>{ziyaret.ziyaretturu}</td>
+                        <td>{ziyaret.ziyaretgorusu}</td>
+                        <td>{ziyaret.resim}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(ziyaret.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(ziyaret.id)}
                           >
                             Düzenle
                           </Button>
@@ -473,7 +495,7 @@ const BasicTypography = () => {
                           />
                         </Form.Group>
                       </Row>
-                      <Button variant="primary" onClick={handleAdd}>
+                      <Button variant="primary" onClick={handleSave}>
                         {editingIndex !== null ? "DÜZENLE" : "EKLE"}
                       </Button>
                     </Form>
@@ -492,22 +514,22 @@ const BasicTypography = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
+                  {ziyarets?.length > 0 ? (
+                    ziyarets.map((ziyaret, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{ziyarets[key]?.not}</td>
-                        <td>{ziyarets[key]?.tarih}</td>
+                        <td>{ziyaret.not}</td>
+                        <td>{ziyaret.tarih}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(ziyaret.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(ziyaret.id)}
                           >
                             Düzenle
                           </Button>
@@ -529,4 +551,4 @@ const BasicTypography = () => {
   );
 };
 
-export default BasicTypography;
+export default Ziyaret;

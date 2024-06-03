@@ -1,11 +1,18 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, Form, Button, Alert } from "react-bootstrap";
-import { db } from "../../../firebase/firebaseConfig";
+import { auth, firestore } from "../../../firebase/firebaseConfig";
 import { uid } from "uid";
-import { set, ref, remove } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
-const BasicCollapse = () => {
+const Firma = () => {
   const [showFirmaForm, setShowFirmaForm] = useState(false);
   const [formData, setFormData] = useState({
     firma: "",
@@ -22,11 +29,12 @@ const BasicCollapse = () => {
   const [error, setError] = useState(null);
 
   const getFirmaData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json")
-      .then((response) => {
-        setFirmas(response?.data || {});
-      });
+    const querySnapshot = await getDocs(collection(firestore, "firmas"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setFirmas(newData);
   };
 
   useEffect(() => {
@@ -50,7 +58,7 @@ const BasicCollapse = () => {
     setError(null); // Değişiklik yapıldığında hatayı sıfırla
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Boş alan kontrolü
     if (
       !formData.firma ||
@@ -67,51 +75,59 @@ const BasicCollapse = () => {
 
     const uuid = editingIndex !== null ? editingIndex : uid();
 
-    set(ref(db, `firmas/${uuid}`), {
-      uuid,
-      firma: formData.firma,
-      firmaAdresi: formData.firmaAdresi,
-      firmaMaili: formData.firmaMaili,
-      firmaTelefonu: formData.firmaTelefonu,
-      yetkili: formData.yetkili,
-      firmaDegerlendirmesi: formData.firmaDegerlendirmesi,
-      calisankisi: formData.calisankisi,
-      stajyer: formData.stajyer,
-    });
-
     if (editingIndex !== null) {
-      remove(ref(db, `firmas/${editingIndex}`));
+      const docRef = doc(firestore, "firmas", editingIndex);
+      await updateDoc(docRef, {
+        uuid,
+        firma: formData.firma,
+        firmaAdresi: formData.firmaAdresi,
+        firmaMaili: formData.firmaMaili,
+        firmaTelefonu: formData.firmaTelefonu,
+        yetkili: formData.yetkili,
+        firmaDegerlendirmesi: formData.firmaDegerlendirmesi,
+        calisankisi: formData.calisankisi,
+        stajyer: formData.stajyer,
+      });
+    } else {
+      await addDoc(collection(firestore, "firmas"), {
+        firma: formData.firma,
+        firmaAdresi: formData.firmaAdresi,
+        firmaMaili: formData.firmaMaili,
+        firmaTelefonu: formData.firmaTelefonu,
+        yetkili: formData.yetkili,
+        firmaDegerlendirmesi: formData.firmaDegerlendirmesi,
+        calisankisi: formData.calisankisi,
+        stajyer: formData.stajyer,
+      });
+
+      setFormData({
+        firma: "",
+        firmaAdresi: "",
+        firmaMaili: "",
+        firmaTelefonu: "",
+        yetkili: "",
+        firmaDegerlendirmesi: 1,
+        calisankisi: "",
+        stajyer: "",
+      });
+
+      setEditingIndex(null);
+      toggleFirmaFormVisibility();
+      getFirmaData();
     }
+  };
 
-    setFormData({
-      firma: "",
-      firmaAdresi: "",
-      firmaMaili: "",
-      firmaTelefonu: "",
-      yetkili: "",
-      firmaDegerlendirmesi: 1,
-      calisankisi: "",
-      stajyer: "",
-    });
-
-    setEditingIndex(null);
-    toggleFirmaFormVisibility();
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(firestore, "firmas", id));
     getFirmaData();
   };
 
-  const handleDelete = (id) => {
-    remove(ref(db, `firmas/${id}`));
-    getFirmaData();
-  };
-
-  const handleEdit = (key) => {
-    const firma = firmas[key];
+  const handleEdit = (id) => {
+    const firma = firmas.find((s) => s.id === id);
     setFormData(firma);
-    setEditingIndex(key);
+    setEditingIndex(id);
     toggleFirmaFormVisibility();
   };
-
-  const keys = firmas != null ? Object.keys(firmas) : [];
 
   return (
     <React.Fragment>
@@ -265,35 +281,33 @@ const BasicCollapse = () => {
                     <th>Firma Telefonu</th>
                     <th>Yetkili Adı ve Soyadı</th>
                     <th>Firma Notu</th>
-                    {/* <th>Çalışan Sayısı</th>
-                    <th>Stajyer Sayısı</th> */}
+
                     <th>İşlemler</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
+                  {firmas?.length > 0 ? (
+                    firmas.map((firma, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{firmas[key]?.uuid}</td>
-                        <td>{firmas[key]?.firma}</td>
-                        <td>{firmas[key]?.firmaAdresi}</td>
-                        <td>{firmas[key]?.firmaMaili}</td>
-                        <td>{firmas[key]?.firmaTelefonu}</td>
-                        <td>{firmas[key]?.yetkili}</td>
-                        {/* <td>{firmas[key]?.firmaDegerlendirmesi}</td>
-                        <td>{firmas[key]?.calisankisi}</td> */}
-                        <td>{firmas[key]?.stajyer}</td>
+                        <td>{firma.uuid}</td>
+                        <td>{firma.firma}</td>
+                        <td>{firma.firmaAdresi}</td>
+                        <td>{firma.firmaMaili}</td>
+                        <td>{firma.firmaTelefonu}</td>
+                        <td>{firma.yetkili}</td>
+                        <td>{firma.firmaDegerlendirmesi}</td>
+
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(firma.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(firma.id)}
                           >
                             Düzenle
                           </Button>
@@ -302,7 +316,7 @@ const BasicCollapse = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8">Veri bulunmamaktadır</td>
+                      <td colSpan="11">Veri bulunmamaktadır</td>
                     </tr>
                   )}
                 </tbody>
@@ -315,4 +329,4 @@ const BasicCollapse = () => {
   );
 };
 
-export default BasicCollapse;
+export default Firma;

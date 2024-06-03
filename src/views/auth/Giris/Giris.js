@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
-import FirebaseLogin from "./FirebaseLogin"; // FirebaseLogin bileşenini içe aktarın
+import FirebaseGiris from "./FirebaseGiris"; // FirebaseLogin bileşenini içe aktarın
 
 const Signin1 = () => {
   return (
@@ -21,16 +21,16 @@ const Signin1 = () => {
               <div className="mb-4">
                 <i className="feather icon-unlock auth-icon" />
               </div>
-              <FirebaseLogin />
+              <FirebaseGiris />
               <p className="mb-2 text-muted">
                 Şifremi unuttum{" "}
-                <NavLink to="/auth/reset-password-1" className="f-w-400">
+                <NavLink to="/auth/sifresifirla" className="f-w-400">
                   Reset
                 </NavLink>
               </p>
               <p className="mb-0 text-muted">
                 Bir hesabın yok mu ?{" "}
-                <NavLink to="/auth/signup-1" className="f-w-400">
+                <NavLink to="/auth/kayit" className="f-w-400">
                   Kayıt Ol
                 </NavLink>
               </p>

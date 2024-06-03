@@ -1,11 +1,17 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Row, Col, Card, Table, Button, Form } from "react-bootstrap";
-import { db } from "../../../firebase/firebaseConfig";
+import { Row, Col, Card, Table, Button, Form, Alert } from "react-bootstrap";
+import { firestore } from "../../../firebase/firebaseConfig";
 import { uid } from "uid";
-import { set, ref, remove } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
-const BasicPagination = () => {
+const Hami = () => {
   const [showHamiForm, setShowHamiForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -19,18 +25,20 @@ const BasicPagination = () => {
   const [error, setError] = useState(null);
 
   const getHamiData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/hamis.json")
-      .then((response) => {
-        setHamis(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "hamis"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setHamis(newData);
   };
   const getFirmaData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json")
-      .then((response) => {
-        setFirmas(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "firmas"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setFirmas(newData);
   };
 
   useEffect(() => {
@@ -40,30 +48,21 @@ const BasicPagination = () => {
 
   const toggleHamiFormVisibility = () => {
     setShowHamiForm(!showHamiForm);
-    setError(null); // Form visibility değiştiğinde hatayı sıfırla
+    setError(null);
   };
+
   const handleChange = (e) => {
     if (e.target.name === "telefon") {
-      // Sadece sayısal değerleri kabul et
       const phoneNumber = e.target.value.replace(/\D/g, "");
-      // En fazla 11 hane olacak şekilde sınırla
       if (phoneNumber.length >= 11) return;
       setFormData({ ...formData, [e.target.name]: phoneNumber });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
-    setError(null); // Değişiklik yapıldığında hatayı sıfırla
-    if (e.target.name === "number") {
-      const numberValue = e.target.value;
-      if (!/^\d*$/.test(numberValue)) {
-        setError("Öğrenci numarası sadece rakam olmalıdır");
-        return;
-      }
-    }
+    setError(null);
   };
 
-  const handleSave = () => {
-    // Boş alan kontrolü
+  const handleSave = async () => {
     if (
       !formData.name ||
       !formData.firma ||
@@ -73,18 +72,26 @@ const BasicPagination = () => {
       setError("Lütfen tüm alanları doldurun");
       return;
     }
+
     const uuid = editingIndex !== null ? editingIndex : uid();
 
-    set(ref(db, `hamis/${uuid}`), {
-      uuid,
-
-      name: formData.name,
-      firma: formData.firma,
-      telefon: formData.telefon,
-      degerlendirmeGorusu: formData.degerlendirmeGorusu,
-    });
     if (editingIndex !== null) {
-      remove(ref(db, `hamis/${editingIndex}`));
+      const docRef = doc(firestore, "hamis", editingIndex);
+      await updateDoc(docRef, {
+        uuid,
+        name: formData.name,
+        firma: formData.firma,
+        telefon: formData.telefon,
+        degerlendirmeGorusu: formData.degerlendirmeGorusu,
+      });
+    } else {
+      await addDoc(collection(firestore, "hamis"), {
+        uuid,
+        name: formData.name,
+        firma: formData.firma,
+        telefon: formData.telefon,
+        degerlendirmeGorusu: formData.degerlendirmeGorusu,
+      });
     }
 
     setFormData({
@@ -94,22 +101,25 @@ const BasicPagination = () => {
       degerlendirmeGorusu: "",
     });
 
+    setEditingIndex(null);
     toggleHamiFormVisibility();
     getHamiData();
   };
 
-  const handleDelete = (id) => {
-    remove(ref(db, `hamis/${id}`));
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(firestore, "hamis", id));
     getHamiData();
   };
 
-  const handleEdit = (key) => {
-    const hami = hamis[key];
+  const handleEdit = (id) => {
+    const hami = hamis.find((s) => s.id === id);
     setFormData(hami);
-    setEditingIndex(key);
+    setEditingIndex(id);
     toggleHamiFormVisibility();
   };
+
   const keys = hamis != null ? Object.keys(hamis) : [];
+
   return (
     <React.Fragment>
       <Row>
@@ -140,15 +150,14 @@ const BasicPagination = () => {
                               onChange={handleChange}
                             />
                           </Form.Group>
-
                           <Form.Group
                             className="mb-3"
                             as={Col}
                             controlId="formGridFirma"
                           >
-                            <Form.Label>Firma </Form.Label>
+                            <Form.Label>Firma</Form.Label>
                             <Form.Control
-                              as="select" // select elementine dönüştürüldü
+                              as="select"
                               name="firma"
                               value={formData.firma}
                               onChange={handleChange}
@@ -163,7 +172,7 @@ const BasicPagination = () => {
                             </Form.Control>
                           </Form.Group>
                         </Row>
-                        <Row gy={3}>
+                        <Row>
                           <Form.Group
                             className="mb-3"
                             as={Col}
@@ -216,26 +225,25 @@ const BasicPagination = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
+                  {hamis.length > 0 ? (
+                    hamis.map((hami, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{hamis[key]?.uuid}</td>
-                        <td>{hamis[key]?.name}</td>
-                        <td>{hamis[key]?.telefon}</td>
-                        <td>{firmas[hamis[key]?.firma]?.firma}</td>
-                        <td>{hamis[key]?.degerlendirmeGorusu}</td>
-
+                        <td>{hami.uuid}</td>
+                        <td>{hami.name}</td>
+                        <td>{hami.telefon}</td>
+                        <td>{firmas[hami.firma]?.firma}</td>
+                        <td>{hami.degerlendirmeGorusu}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(hami.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(hami.id)}
                           >
                             Düzenle
                           </Button>
@@ -244,7 +252,7 @@ const BasicPagination = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6">Veri bulunmamaktadır</td>
+                      <td colSpan="7">Veri bulunmamaktadır</td>
                     </tr>
                   )}
                 </tbody>
@@ -257,4 +265,4 @@ const BasicPagination = () => {
   );
 };
 
-export default BasicPagination;
+export default Hami;

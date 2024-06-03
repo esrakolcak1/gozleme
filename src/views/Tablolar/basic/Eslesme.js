@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Row, Col, Card, Table, Button, Form, Alert } from "react-bootstrap";
-import { db } from "../../../firebase/firebaseConfig";
+import { db, firestore } from "../../../firebase/firebaseConfig";
 import { uid } from "uid";
 import { set, ref, remove } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
-const BasicTabsPills = () => {
+const Eslesme = () => {
   const [showEslesmeForm, setShowEslesmeForm] = useState(false);
   const [formData, setFormData] = useState({
     number: "",
@@ -23,36 +31,39 @@ const BasicTabsPills = () => {
   const [error, setError] = useState(null);
 
   const getEslesmeData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/eslesmes.json")
-      .then((response) => {
-        setEslesmes(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "eslesmes"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setEslesmes(newData);
   };
 
   const getHamiData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/hamis.json")
-      .then((response) => {
-        setHamis(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "hamis"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setHamis(newData);
   };
 
   const getFirmaData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/firmas.json")
-      .then((response) => {
-        setFirmas(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "firmas"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setFirmas(newData);
   };
   const getStudentData = async () => {
-    await axios
-      .get("https://gozleme-cc975-default-rtdb.firebaseio.com/students.json")
-      .then((response) => {
-        setStudents(response?.data);
-      });
+    const querySnapshot = await getDocs(collection(firestore, "students"));
+    const newData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setStudents(newData);
   };
-
   useEffect(() => {
     getEslesmeData();
     getHamiData();
@@ -66,16 +77,11 @@ const BasicTabsPills = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "name" && !/^\d*$/.test(value)) {
-      setError("Öğrenci numarası sadece rakam olmalıdır");
-      return;
-    }
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(null); // Değişiklik yapıldığında hatayı sıfırla
   };
 
-  const handleAdd = () => {
+  const handleSave = async () => {
     if (
       !formData.number ||
       !formData.firma ||
@@ -89,17 +95,28 @@ const BasicTabsPills = () => {
 
     const uuid = editingIndex !== null ? editingIndex : uid();
 
-    set(ref(db, `eslesmes/${uuid}`), {
-      uuid,
-      number: formData.number,
-      firma: formData.firma,
-      hami: formData.hami,
-      donem: formData.donem,
-      not: formData.not,
-    });
+    if (editingIndex !== null) {
+      const docRef = doc(firestore, "eslesmes", editingIndex);
+      await updateDoc(docRef, {
+        number: formData.number,
+        firma: formData.firma,
+        hami: formData.hami,
+        donem: formData.donem,
+        not: formData.not,
+      });
+    } else {
+      await addDoc(collection(firestore, `eslesmes`), {
+        uuid,
+        number: formData.number,
+        firma: formData.firma,
+        hami: formData.hami,
+        donem: formData.donem,
+        not: formData.not,
+      });
+    }
 
     if (editingIndex !== null) {
-      remove(ref(db, `eslesmes/${editingIndex}`));
+      await deleteDoc(doc(firestore, "eslesmes", editingIndex));
     }
 
     setFormData({
@@ -109,26 +126,22 @@ const BasicTabsPills = () => {
       donem: "",
       not: "",
     });
-
+    setEditingIndex(null);
     toggleEslesmeFormVisibility();
     getEslesmeData();
   };
 
-  const handleDelete = (id) => {
-    remove(ref(db, `eslesmes/${id}`));
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(firestore, "eslesmes", id));
     getEslesmeData();
   };
 
   const handleEdit = (key) => {
-    const eslesme = eslesmes[key];
+    const eslesme = eslesmes.find((s) => s.id === key);
     setFormData(eslesme);
     setEditingIndex(key);
     toggleEslesmeFormVisibility();
   };
-
-  console.log(eslesmes);
-
-  const keys = eslesmes ? Object.keys(eslesmes) : [];
 
   return (
     <React.Fragment>
@@ -156,21 +169,16 @@ const BasicTabsPills = () => {
                             <Form.Control
                               as="select"
                               name="number"
-                              value={formData.name}
+                              value={formData.number}
                               onChange={handleChange}
                             >
                               <option value="">Öğrenci seçiniz</option>
                               {students &&
-                                Object.keys(students).map(
-                                  (key) => (
-                                    console.log("key", key),
-                                    (
-                                      <option key={key} value={key}>
-                                        {students[key].name}
-                                      </option>
-                                    )
-                                  )
-                                )}
+                                Object.keys(students).map((key) => (
+                                  <option key={key} value={key}>
+                                    {students[key].name}
+                                  </option>
+                                ))}
                             </Form.Control>
                           </Form.Group>
                           <Form.Group
@@ -249,7 +257,7 @@ const BasicTabsPills = () => {
                             />
                           </Form.Group>
                         </Row>
-                        <Button variant="primary" onClick={handleAdd}>
+                        <Button variant="primary" onClick={handleSave}>
                           {editingIndex !== null ? "DÜZENLE" : "EKLE"}
                         </Button>
                       </Form>
@@ -263,6 +271,7 @@ const BasicTabsPills = () => {
                 <thead>
                   <tr>
                     <th>#</th>
+
                     <th>Öğrenci No</th>
                     <th>Firma</th>
                     <th>Hami</th>
@@ -272,25 +281,26 @@ const BasicTabsPills = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys?.length > 0 ? (
-                    keys.map((key, index) => (
+                  {eslesmes?.length > 0 ? (
+                    eslesmes.map((eslesme, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{students[eslesmes[key]?.number]?.numbers}</td>
-                        <td>{firmas[eslesmes[key]?.firma]?.firma}</td>
-                        <td>{hamis[eslesmes[key]?.hami]?.hami}</td>
-                        <td>{eslesmes[key]?.donem}</td>
-                        <td>{eslesmes[key]?.not}</td>
+
+                        <td>{students[eslesme.number]?.name}</td>
+                        <td>{firmas[eslesme.firma]?.firma}</td>
+                        <td>{hamis[eslesme.hami]?.name}</td>
+                        <td>{eslesme.donem}</td>
+                        <td>{eslesme.not}</td>
                         <td>
                           <Button
                             variant="danger"
-                            onClick={() => handleDelete(key)}
+                            onClick={() => handleDelete(eslesme.id)}
                           >
                             Sil
                           </Button>
                           <Button
                             variant="primary"
-                            onClick={() => handleEdit(key)}
+                            onClick={() => handleEdit(eslesme.id)}
                           >
                             Düzenle
                           </Button>
@@ -312,4 +322,4 @@ const BasicTabsPills = () => {
   );
 };
 
-export default BasicTabsPills;
+export default Eslesme;

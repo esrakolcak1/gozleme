@@ -37,23 +37,23 @@ export const renderRoutes = (routes = []) => (
 const routes = [
   {
     exact: "true",
-    path: "/login",
-    element: lazy(() => import("./views/auth/signin/SignIn1")),
+    path: "/fireabasegiris",
+    element: lazy(() => import("./views/auth/Giris/Giris")),
   },
   {
     exact: "true",
-    path: "/auth/signin-1",
-    element: lazy(() => import("./views/auth/signin/SignIn1")),
+    path: "/auth/giris",
+    element: lazy(() => import("./views/auth/Giris/Giris")),
   },
   {
     exact: "true",
-    path: "/auth/signup-1",
-    element: lazy(() => import("./views/auth/signup/SignUp1")),
+    path: "/auth/kayit",
+    element: lazy(() => import("./views/auth/Kayit/Kayit")),
   },
   {
     exact: "true",
-    path: "/auth/reset-password-1",
-    element: lazy(() => import("./views/auth/reset-password/ResetPassword1")),
+    path: "/auth/sifresifirla",
+    element: lazy(() => import("./views/auth/SifreSifirla/SifreSifirla")),
   },
   {
     path: "*",
@@ -61,46 +61,40 @@ const routes = [
     routes: [
       {
         exact: "true",
-        path: "/app/dashboard/default",
-        element: lazy(() => import("./views/dashboard/index1")),
+        path: "/app/anasayfa/anasayfa",
+        element: lazy(() => import("./views/Anasayfa/Anasayfa")),
       },
       {
         exact: "true",
-        path: "/basic/breadcrumb",
-        element: lazy(() =>
-          import("./views/ui-elements/basic/BasicBreadcrumb")
-        ),
+        path: "/basic/ogretmen",
+        element: lazy(() => import("./views/Tablolar/basic/Ogretmen")),
       },
 
       {
         exact: "true",
-        path: "/basic/badges",
-        element: lazy(() => import("./views/ui-elements/basic/BasicBadges")),
+        path: "/basic/ogrenci",
+        element: lazy(() => import("./views/Tablolar/basic/Ogrenci")),
       },
 
       {
         exact: "true",
-        path: "/basic/pagination",
-        element: lazy(() =>
-          import("./views/ui-elements/basic/BasicPagination")
-        ),
+        path: "/basic/hami",
+        element: lazy(() => import("./views/Tablolar/basic/Hami")),
       },
       {
         exact: "true",
-        path: "/basic/collapse",
-        element: lazy(() => import("./views/ui-elements/basic/BasicCollapse")),
+        path: "/basic/firma",
+        element: lazy(() => import("./views/Tablolar/basic/Firma")),
       },
       {
         exact: "true",
-        path: "/basic/tabs-pills",
-        element: lazy(() => import("./views/ui-elements/basic/BasicTabsPills")),
+        path: "/basic/eslesme",
+        element: lazy(() => import("./views/Tablolar/basic/Eslesme")),
       },
       {
         exact: "true",
-        path: "/basic/typography",
-        element: lazy(() =>
-          import("./views/ui-elements/basic/BasicTypography")
-        ),
+        path: "/basic/ziyaret",
+        element: lazy(() => import("./views/Tablolar/basic/Ziyaret")),
       },
 
       {
@@ -112,7 +106,6 @@ const routes = [
       {
         path: "*",
         exact: "true",
-        // element: () => <Navigate to={BASE_URL} />,
       },
     ],
   },

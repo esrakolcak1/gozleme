@@ -17,13 +17,8 @@ const AdminPanel = () => {
 
   return (
     <div className="admin-panel">
-      <h1>Admin Panel</h1>
-      <p>
-        Welcome to the admin panel. Here you can manage users, view reports, and
-        configure settings.
-      </p>
       <Button variant="primary" onClick={handleLogout}>
-        Logout
+        Çıkış
       </Button>
     </div>
   );
