@@ -4,10 +4,9 @@ import { NavLink } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
 import { auth, firestore, db } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
-import { collection, addDoc } from "firebase/firestore";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 
-const SignUp1 = () => {
+const Kayit = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user"); // Varsayılan rol olarak 'user'
@@ -26,7 +25,7 @@ const SignUp1 = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault(); // sayfa yenilenmesini önleme
-     
+
       if (!email || !password) {
         return;
       }
@@ -37,7 +36,6 @@ const SignUp1 = () => {
 
           postDataFirestore(user);
           alert("Kayıt oldunuz");
-       
         })
         .catch((e) => {
           alert(e.message);
@@ -93,14 +91,6 @@ const SignUp1 = () => {
                       />
                     </div>
                     <div className="input-group mb-4">
-                      {/* <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Rol (Varsayılan: user)"
-                        value={role}
-                        onChange={(e) => setRole(e.currentTarget.value)}
-                      /> */}
-
                       <Form.Control
                         as="select"
                         name="roles"
@@ -109,11 +99,11 @@ const SignUp1 = () => {
                           setRole(e.target.value);
                         }}
                       >
-                        <option value="">Öğretmen seçiniz</option>
+                        <option value="">Rol seçiniz</option>
                         {roles &&
                           Object.keys(roles).map((key) => (
                             <option key={key} value={key.value}>
-                              {roles[key].label}
+                              {roles[key].value}
                             </option>
                           ))}
                       </Form.Control>
@@ -138,4 +128,4 @@ const SignUp1 = () => {
   );
 };
 
-export default SignUp1;
+export default Kayit;

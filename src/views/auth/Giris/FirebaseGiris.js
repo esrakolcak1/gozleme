@@ -8,7 +8,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db, firestore } from "../../../firebase/firebaseConfig"; // Firebase yapılandırma dosyasını içe aktarın
 import { addDoc, collection, getDocs } from "firebase/firestore";
 
-const FirebaseLogin = ({ className, ...rest }) => {
+const FirebaseGiris = ({ className, ...rest }) => {
   const navigate = useNavigate();
 
   const [students, setStudents] = useState([]);
@@ -22,19 +22,24 @@ const FirebaseLogin = ({ className, ...rest }) => {
     setStudents(newData);
   };
 
-  const getUserRoleControl = (user) => {
+  console.log("students", students);
 
-   
-    let adminControl = students.find((item) => item.email == user ?  true : false); 
+  const getUserRoleControl = (user) => {
+    let adminControl = students.find((item) =>
+      item.email == user ? true : false
+    );
 
     if (adminControl) {
-      localStorage.setItem("user", JSON.stringify({ email: user, role: "admin" }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email: user, role: "admin" })
+      );
     } else {
-      localStorage.setItem("user", JSON.stringify({ email: user, role: "user" }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email: user, role: "user" })
+      );
     }
-
-    navigate("/app/anasayfa/anasayfa");
-    
   };
 
   useEffect(() => {
@@ -70,7 +75,6 @@ const FirebaseLogin = ({ className, ...rest }) => {
                 uuid: user.uid,
                 sonGirisTarihi: user?.metadata.lastSignInTime,
                 kayitTarihi: user?.metadata?.creationTime,
-
                 mail: user?.email,
               });
             } else {
@@ -78,9 +82,8 @@ const FirebaseLogin = ({ className, ...rest }) => {
 
             getUserRoleControl(user?.email);
 
-            // navigate("/app/anasayfa/anasayfa"); // Giriş başarılıysa yönlendir
+            navigate("/app/anasayfa/anasayfa"); // Giriş başarılıysa yönlendir
           } catch (error) {
-       
             if (
               error.code === "auth/wrong-password" ||
               error.code === "auth/user-not-found"
@@ -90,7 +93,6 @@ const FirebaseLogin = ({ className, ...rest }) => {
               setErrors({ submit: "Kullanıcı adı veya şifre yanlış." });
             }
             setSubmitting(false);
-          
           }
         }}
       >
@@ -190,8 +192,8 @@ const FirebaseLogin = ({ className, ...rest }) => {
   );
 };
 
-FirebaseLogin.propTypes = {
+FirebaseGiris.propTypes = {
   className: PropTypes.string,
 };
 
-export default FirebaseLogin;
+export default FirebaseGiris;

@@ -16,11 +16,15 @@ const App = () => {
     };
   }, []);
 
-  const role = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).role : null;
+  const role = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")).role
+    : null;
 
   return (
     <React.Fragment>
-      <BrowserRouter basename={process.env.REACT_APP_BASE_NAME}>{renderRoutes(routes)}</BrowserRouter>
+      <BrowserRouter basename={process.env.REACT_APP_BASE_NAME}>
+        {renderRoutes(routes)}
+      </BrowserRouter>
     </React.Fragment>
   );
 };

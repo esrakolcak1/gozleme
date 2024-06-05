@@ -16,11 +16,8 @@ const EklentiTablosu = () => {
         id: doc.id,
       }));
       setStudents(newData);
-
     });
   };
-
-
 
   const ogretmenleriGetir = async () => {
     try {

@@ -1,6 +1,5 @@
 import ReactEcharts from "echarts-for-react";
 import React, { useEffect, useState } from "react";
-// import axios from "axios"; // axios kütüphanesini import et
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../../../../firebase/firebaseConfig";
 import * as _ from "lodash";

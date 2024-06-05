@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, Form, Button, Alert } from "react-bootstrap";
 import { db, firestore } from "../../../firebase/firebaseConfig";
@@ -120,7 +119,7 @@ const Ziyaret = () => {
     const uuid = editingIndex !== null ? editingIndex : uid();
 
     if (editingIndex !== null) {
-      const docRef = doc(firestore, "students", editingIndex);
+      const docRef = doc(firestore, "ziyarets", editingIndex);
       await updateDoc(docRef, {
         uuid,
         teacher: formData.teacher,
@@ -194,6 +193,7 @@ const Ziyaret = () => {
                   <div>
                     <Card.Body>
                       {error && <Alert variant="danger">{error}</Alert>}
+
                       <Form>
                         <Row>
                           <Form.Group
@@ -306,8 +306,6 @@ const Ziyaret = () => {
                 <tbody>
                   {ziyarets.length > 0 ? (
                     ziyarets.map((ziyaret, index) => (
-
-                     
                       <tr key={index}>
                         <th>{index + 1}</th>
                         <td>{ziyaret.id}</td>

@@ -53,7 +53,17 @@ const Firma = () => {
         setError("Telefon numarası sadece rakam olmalıdır");
         return;
       }
+      if (formData.firmaTelefonu === firmaTelefonuValue) {
+        setError("Aynı telefon numarasını tekrar giremezsiniz");
+        return;
+      }
     }
+    const firmaMailiValue = formData.firmaMaili;
+    if (formData.firmaMaili === firmaMailiValue) {
+      setError("Aynı maili tekrar giremezsiniz");
+      return;
+    }
+
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(null); // Değişiklik yapıldığında hatayı sıfırla
   };
@@ -90,6 +100,7 @@ const Firma = () => {
       });
     } else {
       await addDoc(collection(firestore, "firmas"), {
+        uuid,
         firma: formData.firma,
         firmaAdresi: formData.firmaAdresi,
         firmaMaili: formData.firmaMaili,
@@ -101,6 +112,7 @@ const Firma = () => {
       });
 
       setFormData({
+        uuid,
         firma: "",
         firmaAdresi: "",
         firmaMaili: "",
@@ -290,7 +302,7 @@ const Firma = () => {
                     firmas.map((firma, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{firma.uuid}</td>
+                        <td>{firma.id}</td>
                         <td>{firma.firma}</td>
                         <td>{firma.firmaAdresi}</td>
                         <td>{firma.firmaMaili}</td>

@@ -6,7 +6,7 @@ import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseConfig";
 
-const ResetPassword1 = () => {
+const SifreSifirla = () => {
   const [email, setEmail] = useState("");
   const handleSubmit = useCallback(
     (e) => {
@@ -73,4 +73,4 @@ const ResetPassword1 = () => {
   );
 };
 
-export default ResetPassword1;
+export default SifreSifirla;

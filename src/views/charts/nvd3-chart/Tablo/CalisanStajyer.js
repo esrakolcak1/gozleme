@@ -15,14 +15,13 @@ const CalisanStajyer = () => {
           ...doc.data(),
           id: doc.id,
         }));
-       
 
         newData.map((e) => {
           calisan.pu;
           setCalisan(...calisan, Number(e.calisankisi));
           setStajyer(...stajyer, Number(e.stajyer));
         });
-    
+
         setFirmas(newData);
       });
     } catch (error) {
@@ -50,7 +49,7 @@ const CalisanStajyer = () => {
     xAxis: [
       {
         type: "category",
-        data: Object.keys(firmalar).length,
+        data: firmalar.map((e) => e.firma),
         axisPointer: {
           type: "shadow",
         },

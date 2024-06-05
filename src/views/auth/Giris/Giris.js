@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import Breadcrumb from "../../../layouts/AdminLayout/Breadcrumb";
 import FirebaseGiris from "./FirebaseGiris"; // FirebaseLogin bileşenini içe aktarın
 
-const Signin1 = () => {
+const Giris1 = () => {
   return (
     <React.Fragment>
       <Breadcrumb />
@@ -42,4 +42,4 @@ const Signin1 = () => {
   );
 };
 
-export default Signin1;
+export default Giris1;

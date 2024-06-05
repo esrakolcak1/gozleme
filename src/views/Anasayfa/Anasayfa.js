@@ -17,7 +17,6 @@ const Anasayfa = () => {
         ...doc.data(),
       }));
       setUsers(fetchedUsers);
-   
     } catch (error) {
       console.error("Firestore verileri alınırken hata oluştu:", error);
     }
@@ -30,37 +29,6 @@ const Anasayfa = () => {
   return (
     <React.Fragment>
       <Row>
-        <Col sm={12}>
-          <Card>
-            <Card.Header>
-              <Card.Title as="h5">Kullanıcı Tablosu</Card.Title>
-            </Card.Header>
-            <Card.Body>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Mail</th>
-                    <th>Kayıt Tarihi</th>
-                    <th>Son Giriş Tarihi</th>
-                    <th>UUID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user, index) => (
-                    <tr key={user.id}>
-                      <td>{index + 1}</td>
-                      <td>{user.mail}</td>
-                      <td>{user.kayitTarihi}</td>
-                      <td>{user.sonGirisTarihi}</td>
-                      <td>{user.uuid}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
-        </Col>
         <Col md={6}>
           <Card>
             <Card.Header>
@@ -88,6 +56,40 @@ const Anasayfa = () => {
             </Card.Header>
             <Card.Body>
               <CalisanStajyer />
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col sm={12}>
+          <Card>
+            <Card.Header>
+              <Card.Title as="h5">Kullanıcı Giris Tablosu</Card.Title>
+            </Card.Header>
+
+            <Card.Body>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Mail</th>
+                    <th>Kayıt Tarihi</th>
+                    <th>Son Giriş Tarihi</th>
+                    <th>id</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users
+                    .sort((a, b) => (a?.kayitTarihi > b?.kayitTarihi ? -1 : 1))
+                    .map((user, index) => (
+                      <tr key={user.id}>
+                        <td>{index + 1}</td>
+                        <td>{user.mail}</td>
+                        <td>{user.kayitTarihi}</td>
+                        <td>{user.sonGirisTarihi}</td>
+                        <td>{user.uuid}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </Table>
             </Card.Body>
           </Card>
         </Col>
